@@ -1,9 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  styleUrls: ['./dashboard.css']
 })
-export class Dashboard {}
+export class DashboardComponent implements OnInit {
+
+  message = '';
+
+  constructor(private apiService: ApiService) {}
+
+  ngOnInit(): void {
+
+    this.apiService.pingBackend().subscribe((res: any) => {
+
+      console.log("API RESPONSE:", res);
+
+      this.message = res.message;
+
+    });
+
+  }
+}
