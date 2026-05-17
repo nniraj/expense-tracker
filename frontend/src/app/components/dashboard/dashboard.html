@@ -1,3 +1,100 @@
-<h1>Dashboard Loaded</h1>
+<app-navbar></app-navbar>
 
-<h2>{{ message }}</h2>
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1>📊 Dashboard</h1>
+    <p class="subtitle">Track and manage your expenses</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div *ngIf="!loading" class="summary-cards">
+    <!-- Total Expenses -->
+    <div class="card card-primary">
+      <div class="card-icon">💰</div>
+      <div class="card-content">
+        <h3>Total Expenses</h3>
+        <p class="card-value">{{ formatCurrency(totalExpenses) }}</p>
+        <span class="card-subtitle">{{ expenseCount }} expenses tracked</span>
+      </div>
+    </div>
+
+    <!-- This Month -->
+    <div class="card card-success">
+      <div class="card-icon">📅</div>
+      <div class="card-content">
+        <h3>{{ getCurrentMonth() }}</h3>
+        <p class="card-value">{{ formatCurrency(thisMonthExpenses) }}</p>
+        <span class="card-subtitle">{{ thisMonthCount }} expenses this month</span>
+      </div>
+    </div>
+
+    <!-- Average Expense -->
+    <div class="card card-info">
+      <div class="card-icon">📊</div>
+      <div class="card-content">
+        <h3>Average Expense</h3>
+        <p class="card-value">{{ formatCurrency(averageExpense) }}</p>
+        <span class="card-subtitle">Per transaction</span>
+      </div>
+    </div>
+
+    <!-- Highest Expense -->
+    <div class="card card-warning">
+      <div class="card-icon">🔝</div>
+      <div class="card-content">
+        <h3>Highest Expense</h3>
+        <p class="card-value">{{ formatCurrency(highestExpense) }}</p>
+        <span class="card-subtitle">{{ getTrendIndicator() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div *ngIf="!loading" class="quick-actions">
+    <a routerLink="/expenses" class="action-btn action-add">
+      ➕ Add New Expense
+    </a>
+    <a routerLink="/expenses" class="action-btn action-view">
+      📋 View All Expenses
+    </a>
+  </div>
+
+  <!-- Recent Expenses -->
+  <div *ngIf="!loading && recentExpenses.length > 0" class="recent-section">
+    <h2>Recent Expenses</h2>
+    <div class="recent-list">
+      <div *ngFor="let expense of recentExpenses" class="recent-item">
+        <div class="recent-info">
+          <p class="recent-description">{{ expense.description }}</p>
+          <span class="recent-date">{{ formatDate(expense.date) }}</span>
+        </div>
+        <div class="recent-amount">
+          <span class="amount-value">{{ formatCurrency(expense.amount) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && expenseCount === 0" class="empty-state">
+    <div class="empty-icon">💸</div>
+    <h2>No Expenses Yet</h2>
+    <p>Start tracking your expenses to see insights here.</p>
+    <a routerLink="/expenses" class="btn-add-expense">Add Your First Expense</a>
+  </div>
+
+  <!-- Future Chart Section Placeholder -->
+  <div *ngIf="!loading" class="charts-section-placeholder">
+    <h2>📈 Analytics (Coming Soon)</h2>
+    <div class="chart-placeholder">
+      <p>Charts and detailed analytics will be available soon!</p>
+    </div>
+  </div>
+</div>

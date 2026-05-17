@@ -33,7 +33,7 @@ export const routes: Routes = [
   },
   {
     path: 'expenses',
-    loadComponent: () => import('./components/expense/expense').then(m => m.Expense),
+    loadComponent: () => import('./components/expense/expense-list/expense-list.component').then(m => m.ExpenseListComponent),
     canActivate: [AuthGuard]
   },
 

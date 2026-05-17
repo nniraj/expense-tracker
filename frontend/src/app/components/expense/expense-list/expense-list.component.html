@@ -1,0 +1,179 @@
+<app-navbar></app-navbar>
+
+<div class="expense-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>💸 Expenses</h1>
+    <button class="btn-add" (click)="loadExpenses()">+ Add Expense</button>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="success" class="alert alert-success">
+    <strong>✓ Success!</strong> {{ success }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-error">
+    <strong>✗ Error!</strong> {{ error }}
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <!-- Search -->
+      <div class="filter-group">
+        <label>Search</label>
+        <input
+          type="text"
+          placeholder="Search by description..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          class="filter-input"
+        />
+      </div>
+
+      <!-- Category Filter -->
+      <div class="filter-group">
+        <label>Category</label>
+        <select
+          [(ngModel)]="selectedCategory"
+          (change)="onFilterChange()"
+          class="filter-input"
+        >
+          <option [value]="null">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat.id">
+            {{ cat.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Sort By -->
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [(ngModel)]="sortBy"
+          (change)="onSortChange()"
+          class="filter-input"
+        >
+          <option value="date">Date</option>
+          <option value="amount">Amount</option>
+        </select>
+      </div>
+
+      <!-- Sort Order -->
+      <div class="filter-group">
+        <label>Order</label>
+        <select
+          [(ngModel)]="sortOrder"
+          (change)="onSortChange()"
+          class="filter-input"
+        >
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </select>
+      </div>
+
+      <!-- Clear Filters -->
+      <button class="btn-clear" (click)="clearFilters()">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading expenses...</p>
+  </div>
+
+  <!-- Expenses Table -->
+  <div *ngIf="!loading" class="table-wrapper">
+    <div *ngIf="paginatedExpenses.length === 0" class="no-data">
+      <p>No expenses found. <a href="javascript:void(0)">Add your first expense</a></p>
+    </div>
+
+    <table *ngIf="paginatedExpenses.length > 0" class="expenses-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th class="text-right">Amount</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let expense of paginatedExpenses" class="expense-row">
+          <td class="date-cell">{{ formatDate(expense.date) }}</td>
+          <td class="description-cell">{{ expense.description }}</td>
+          <td class="category-cell">
+            <span class="category-badge">
+              {{ getCategoryName(expense.category_id) }}
+            </span>
+          </td>
+          <td class="amount-cell text-right">
+            <strong>{{ formatCurrency(expense.amount) }}</strong>
+          </td>
+          <td class="actions-cell text-center">
+            <button class="btn-edit" title="Edit">✎</button>
+            <button
+              class="btn-delete"
+              (click)="deleteExpense(expense.id)"
+              title="Delete"
+            >
+              🗑
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot *ngIf="paginatedExpenses.length > 0">
+        <tr>
+          <td colspan="3" class="text-right">
+            <strong>Page Total:</strong>
+          </td>
+          <td class="text-right">
+            <strong>{{ formatCurrency(displayedTotal) }}</strong>
+          </td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="pagination">
+    <button
+      (click)="goToPage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+      class="btn-pagination"
+    >
+      ← Previous
+    </button>
+
+    <div class="page-numbers">
+      <button
+        *ngFor="let page of pageNumbers"
+        (click)="goToPage(page)"
+        [class.active]="page === currentPage"
+        class="page-number"
+      >
+        {{ page }}
+      </button>
+    </div>
+
+    <button
+      (click)="goToPage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+      class="btn-pagination"
+    >
+      Next →
+    </button>
+  </div>
+
+  <!-- Summary -->
+  <div *ngIf="!loading && paginatedExpenses.length > 0" class="summary">
+    <p>
+      Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
+      <strong>{{ Math.min(currentPage * itemsPerPage, totalExpenses) }}</strong>
+      of <strong>{{ totalExpenses }}</strong> expenses
+    </p>
+  </div>
+</div>

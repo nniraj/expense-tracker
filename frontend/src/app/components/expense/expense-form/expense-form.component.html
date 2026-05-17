@@ -1,0 +1,95 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Expense' : 'Add New Expense' }}</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-error">
+        <strong>Error!</strong> {{ error }}
+      </div>
+
+      <form [formGroup]="expenseForm" (ngSubmit)="onSubmit()">
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Enter expense description"
+            class="form-control"
+            [class.is-invalid]="submitted && f['description'].errors"
+            rows="3"
+          ></textarea>
+          <div *ngIf="submitted && f['description'].errors" class="invalid-feedback">
+            <span *ngIf="f['description'].errors['required']">Description is required</span>
+            <span *ngIf="f['description'].errors['maxlength']">Description must be less than 200 characters</span>
+          </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group">
+          <label for="amount">Amount *</label>
+          <input
+            type="number"
+            id="amount"
+            formControlName="amount"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            class="form-control"
+            [class.is-invalid]="submitted && f['amount'].errors"
+          />
+          <div *ngIf="submitted && f['amount'].errors" class="invalid-feedback">
+            <span *ngIf="f['amount'].errors['required']">Amount is required</span>
+            <span *ngIf="f['amount'].errors['min']">Amount must be greater than 0</span>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select
+            id="category"
+            formControlName="category_id"
+            class="form-control"
+          >
+            <option [value]="null">No Category</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">
+              {{ cat.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label for="date">Date *</label>
+          <input
+            type="date"
+            id="date"
+            formControlName="date"
+            class="form-control"
+            [class.is-invalid]="submitted && f['date'].errors"
+          />
+          <div *ngIf="submitted && f['date'].errors" class="invalid-feedback">
+            <span *ngIf="f['date'].errors['required']">Date is required</span>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button
+        class="btn-save"
+        (click)="onSubmit()"
+        [disabled]="loading"
+      >
+        <span *ngIf="!loading">{{ isEditMode ? 'Update' : 'Save' }} Expense</span>
+        <span *ngIf="loading" class="spinner"></span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <div class="navbar-logo">
+      <a routerLink="/dashboard" class="logo-link">
+        <span class="logo-icon">💰</span>
+        <span class="logo-text">Expense Tracker</span>
+      </a>
+    </div>
+
+    <!-- Hamburger Menu (Mobile) -->
+    <button class="hamburger" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Navigation Menu -->
+    <ul class="nav-menu" [class.active]="isMenuOpen">
+      <li class="nav-item">
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()" class="nav-link">
+          📊 Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/expenses" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          💸 Expenses
+        </a>
+      </li>
+    </ul>
+
+    <!-- User Menu -->
+    <div class="user-menu" *ngIf="currentUser">
+      <div class="user-info">
+        <span class="username">👤 {{ currentUser.username }}</span>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
