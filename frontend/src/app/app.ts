@@ -1,13 +1,17 @@
-  import { Component, signal } from '@angular/core';
-  import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
-  @Component({
-    selector: 'app-root',
-    standalone: true,
-    imports: [RouterOutlet],
-    templateUrl: './app.html',
-    styleUrl: './app.css'
-  })
-  export class App {
-    protected readonly title = signal('frontend');
-  }
+/**
+ * Root Application Component
+ * Serves as the main container for all routes
+ */
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
+})
+export class App {
+  title = 'Expense Tracker';
+}
