@@ -1,49 +1,46 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
+  HttpInterceptorFn,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
 
 /**
- * Auth Interceptor
+ * Auth Interceptor (Functional)
  * Automatically adds JWT token to all HTTP requests
  * Handles 401 errors by redirecting to login
  */
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  constructor(
-    private authService: AuthService,
-    private storageService: StorageService
-  ) {}
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+      console.log('AUTH INTERCEPTOR EXECUTED');
+  const storageService = inject(StorageService);
+  const authService = inject(AuthService);
+  
+  const token = storageService.getToken();
+  console.log('TOKEN:', token);
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.storageService.getToken();
-
-    if (token) {
-      // Add Authorization header with JWT token
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-    }
-
-    return next.handle(request).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          // Token expired or invalid
-          this.authService.logout();
-          window.location.href = '/login';
-        }
-        return throwError(() => error);
-      })
-    );
+  if (token) {
+    // Add Authorization header with JWT token
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
   }
-}
+
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        // Token expired or invalid
+console.error('401 Unauthorized', error);
+authService.logout();
+console.log('Interceptor token:', token);
+console.log('Request URL:', req.url);
+      }
+      return throwError(() => error);
+    })
+  );
+};
+

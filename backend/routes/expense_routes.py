@@ -23,19 +23,23 @@ def create_expense():
         401: If user is not authenticated
         400: If required fields are missing
     """
-    user_id = int(get_jwt_identity())
-    data = request.json
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.json
 
-    expense = Expense(
-        amount=data['amount'],
-        description=data['description'],
-        category_id=data.get('category_id'),
-        user_id=user_id
-    )
+        expense = Expense(
+            amount=data['amount'],
+            description=data['description'],
+            category_id=data.get('category_id'),
+            user_id=user_id
+        )
 
-    db.session.add(expense)
-    db.session.commit()
-    return jsonify({"msg": "Expense added"})
+        db.session.add(expense)
+        db.session.commit()
+        return jsonify({"msg": "Expense added"})
+    except Exception as e:
+        print(f"Error creating expense: {e}")
+        return jsonify({"msg": f"Error: {str(e)}"}), 500
 
 
 @expense_bp.route('/', methods=['GET'])
@@ -50,16 +54,20 @@ def get_expenses():
     Raises:
         401: If user is not authenticated
     """
-    user_id = int(get_jwt_identity())
-    expenses = Expense.query.filter_by(user_id=user_id).all()
+    try:
+        user_id = int(get_jwt_identity())
+        expenses = Expense.query.filter_by(user_id=user_id).all()
 
-    return jsonify([
-        {
-            "id": e.id,
-            "amount": e.amount,
-            "description": e.description
-        } for e in expenses
-    ])
+        return jsonify([
+            {
+                "id": e.id,
+                "amount": e.amount,
+                "description": e.description
+            } for e in expenses
+        ])
+    except Exception as e:
+        print(f"Error fetching expenses: {e}")
+        return jsonify({"msg": f"Error: {str(e)}"}), 500
 
 
 @expense_bp.route('/<int:id>', methods=['PUT'])
@@ -83,7 +91,10 @@ def update_expense(id):
         401: If user is not authenticated
         404: If expense ID not found
     """
-    expense = Expense.query.get(id)
+    user_id = int(get_jwt_identity())
+    expense = Expense.query.filter_by(id=id, user_id=user_id).first()
+    if not expense:
+        return jsonify({"msg": "Expense not found"}), 404
     data = request.json
     expense.amount = data.get('amount', expense.amount)
     expense.description = data.get('description', expense.description)
@@ -108,7 +119,10 @@ def delete_expense(id):
         401: If user is not authenticated
         404: If expense ID not found
     """
-    expense = Expense.query.get(id)
+    user_id = int(get_jwt_identity())
+    expense = Expense.query.filter_by(id=id, user_id=user_id).first()
+    if not expense:
+        return jsonify({"msg": "Expense not found"}), 404
     db.session.delete(expense)
     db.session.commit()
 
