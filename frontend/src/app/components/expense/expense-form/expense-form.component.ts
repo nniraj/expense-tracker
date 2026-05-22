@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ExpenseService } from '../../../services/expense.service';
@@ -17,7 +17,7 @@ import { Category } from '../../../models/category.model';
   templateUrl: './expense-form.component.html',
   styleUrl: './expense-form.component.css'
 })
-export class ExpenseFormComponent implements OnInit {
+export class ExpenseFormComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() expense: Expense | null = null;
   @Output() close = new EventEmitter<void>();
@@ -70,8 +70,8 @@ export class ExpenseFormComponent implements OnInit {
   /**
    * Handle modal opening
    */
-  ngOnChanges(): void {
-    if (this.isOpen) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen'] && this.isOpen) {
       if (this.expense) {
         this.isEditMode = true;
         this.populateForm(this.expense);

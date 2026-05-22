@@ -62,7 +62,9 @@ def get_expenses():
             {
                 "id": e.id,
                 "amount": e.amount,
-                "description": e.description
+                "description": e.description,
+                "date": e.date.isoformat(),
+                "category_id": e.category_id
             } for e in expenses
         ])
     except Exception as e:

@@ -4,7 +4,7 @@
   <!-- Header -->
   <div class="header">
     <h1>💸 Expenses</h1>
-    <button class="btn-add" (click)="loadExpenses()">+ Add Expense</button>
+    <button class="btn-add" (click)="openAddForm()">+ Add Expense</button>
   </div>
 
   <!-- Success Message -->
@@ -113,7 +113,7 @@
             <strong>{{ formatCurrency(expense.amount) }}</strong>
           </td>
           <td class="actions-cell text-center">
-            <button class="btn-edit" title="Edit">✎</button>
+            <button class="btn-edit" (click)="openEditForm(expense)" title="Edit">✎</button>
             <button
               class="btn-delete"
               (click)="deleteExpense(expense.id)"
@@ -176,4 +176,12 @@
       of <strong>{{ totalExpenses }}</strong> expenses
     </p>
   </div>
+
+  <!-- Expense Form Modal -->
+  <app-expense-form
+    [isOpen]="isFormOpen"
+    [expense]="selectedExpense"
+    (close)="closeForm()"
+    (saved)="onFormSave()"
+  ></app-expense-form>
 </div>

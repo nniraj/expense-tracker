@@ -6,6 +6,7 @@ import { CategoryService } from '../../../services/category.service';
 import { Expense } from '../../../models/expense.model';
 import { Category } from '../../../models/category.model';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { ExpenseFormComponent } from '../expense-form/expense-form.component';
 
 /**
  * Expense List Component
@@ -14,7 +15,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 @Component({
   selector: 'app-expense-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, ExpenseFormComponent],
   templateUrl: './expense-list.component.html',
   styleUrl: './expense-list.component.css'
 })
@@ -36,6 +37,10 @@ export class ExpenseListComponent implements OnInit {
   selectedCategory: number | null = null;
   sortBy: 'date' | 'amount' = 'date';
   sortOrder: 'asc' | 'desc' = 'desc';
+
+  // Form state
+  isFormOpen = false;
+  selectedExpense: Expense | null = null;
 
   constructor(
     private expenseService: ExpenseService,
@@ -260,5 +265,39 @@ export class ExpenseListComponent implements OnInit {
    */
   get displayedTotal(): number {
     return this.paginatedExpenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+  }
+
+  /**
+   * Open form for adding new expense
+   */
+  openAddForm(): void {
+    this.selectedExpense = null;
+    this.isFormOpen = true;
+  }
+
+  /**
+   * Open form for editing expense
+   */
+  openEditForm(expense: Expense): void {
+    this.selectedExpense = expense;
+    this.isFormOpen = true;
+  }
+
+  /**
+   * Close form
+   */
+  closeForm(): void {
+    this.isFormOpen = false;
+    this.selectedExpense = null;
+  }
+
+  /**
+   * Handle form save
+   */
+  onFormSave(): void {
+    this.closeForm();
+    this.loadExpenses();
+    this.success = 'Expense saved successfully!';
+    setTimeout(() => (this.success = null), 3000);
   }
 }

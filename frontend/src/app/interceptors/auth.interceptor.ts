@@ -14,12 +14,10 @@ import { StorageService } from '../services/storage.service';
  * Handles 401 errors by redirecting to login
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-      console.log('AUTH INTERCEPTOR EXECUTED');
   const storageService = inject(StorageService);
   const authService = inject(AuthService);
   
   const token = storageService.getToken();
-  console.log('TOKEN:', token);
 
   if (token) {
     // Add Authorization header with JWT token
@@ -36,8 +34,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         // Token expired or invalid
 console.error('401 Unauthorized', error);
 authService.logout();
-console.log('Interceptor token:', token);
-console.log('Request URL:', req.url);
       }
       return throwError(() => error);
     })
