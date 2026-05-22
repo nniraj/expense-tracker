@@ -21,12 +21,33 @@ def register():
         
     Status codes:
         201: User registered successfully
-        400: Email already exists
+        400: Missing required fields or email already exists
     """
     data = request.get_json()
+    
+    if not data:
+        return jsonify({
+            "success": False,
+            "message": "Request body is required"
+        }), 400
+    
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+
+    # Validate required fields
+    if not username or not email or not password:
+        return jsonify({
+            "success": False,
+            "message": "username, email, and password are required"
+        }), 400
+    
+    # Validate email format (basic check)
+    if '@' not in email or '.' not in email:
+        return jsonify({
+            "success": False,
+            "message": "Invalid email format"
+        }), 400
 
     # check existing email
     existing_user = User.query.filter_by(email=email).first()
@@ -35,6 +56,15 @@ def register():
         return jsonify({
             "success": False,
             "message": "Email already exists"
+        }), 400
+    
+    # Check existing username
+    existing_username = User.query.filter_by(username=username).first()
+    
+    if existing_username:
+        return jsonify({
+            "success": False,
+            "message": "Username already exists"
         }), 400
 
     user = User(
@@ -68,12 +98,26 @@ def login():
         
     Status codes:
         200: Login successful, token returned
+        400: Missing required fields
         401: Invalid credentials (email not found or wrong password)
     """
     data = request.get_json()
+    
+    if not data:
+        return jsonify({
+            "success": False,
+            "message": "Request body is required"
+        }), 400
 
     email = data.get('email')
     password = data.get('password')
+    
+    # Validate required fields
+    if not email or not password:
+        return jsonify({
+            "success": False,
+            "message": "email and password are required"
+        }), 400
 
     user = User.query.filter_by(email=email).first()
 
