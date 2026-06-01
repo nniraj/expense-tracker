@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: expense_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env.example
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/expense_db
+      FLASK_APP: run.py
+    depends_on:
+      - db
+      
+  frontend:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    command: ["sh", "-c", "sed -i 's/127.0.0.1:5000/db:5000/; s/db:5000/backend:5000/' proxy.conf.json || true && npm install && npm start -- --host 0.0.0.0 --proxy-config proxy.conf.json"]
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
