@@ -5,4 +5,4 @@ echo "Running database migrations..."
 flask db upgrade
 
 echo "Starting Gunicorn..."
-exec gunicorn -w 4 -b 0.0.0.0:5000 run:app
+exec gunicorn --bind 127.0.0.1:5000 run:app
