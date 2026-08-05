@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   db:
     image: postgres:15
@@ -15,8 +16,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"   # internal only, no public port
     env_file:
       - ./backend/.env.example
     environment:
@@ -24,16 +25,17 @@ services:
       FLASK_APP: run.py
     depends_on:
       - db
-      
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "4200:80"
+      - "4200:80"   # public entry point
     depends_on:
       - backend
+    # Nginx config should proxy /api/* → http://backend:5000
 
 volumes:
   db_data:
